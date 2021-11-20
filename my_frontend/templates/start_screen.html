@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Chess AI</title>
+    <script src="static/start_screen.js"></script>
+</head>
+<body>
+<div id="my_data" data-possible_moves="{{possible_moves}}"></div>
+
+<table border="2">
+    {% for y in range(8) %}
+    <tr>
+        {% for x in range(8) %}
+        <td>
+           <div id="square-{{x}}-{{y}}">
+               {{ board[x][y] }}
+           </div>
+        </td>
+        {% endfor %}
+    </tr>
+    {% endfor %}
+</table>
+
+</body>
+</html>
