@@ -1,0 +1,1597 @@
+import re
+import subprocess
+
+
+def diff_perft_1():
+
+    a = """Move d8e7 7 '8/3pk3/2r5/2P5/2K5/8/8/8 w  - - 0 0'
+Move d8c7 7 '8/2kp4/2r5/2P5/2K5/8/8/8 w  - - 0 0'
+Move d8e8 7 '4k3/3p4/2r5/2P5/2K5/8/8/8 w  - - 0 0'
+Move d8c8 7 '2k5/3p4/2r5/2P5/2K5/8/8/8 w  - - 0 0'
+Move c6c5 5 '3k4/3p4/8/2r5/2K5/8/8/8 w  - - 0 0'
+Move c6h6 8 '3k4/3p4/7r/2P5/2K5/8/8/8 w  - - 0 0'
+Move c6g6 8 '3k4/3p4/6r1/2P5/2K5/8/8/8 w  - - 0 0'
+Move c6f6 8 '3k4/3p4/5r2/2P5/2K5/8/8/8 w  - - 0 0'
+Move c6e6 8 '3k4/3p4/4r3/2P5/2K5/8/8/8 w  - - 0 0'
+Move c6d6 6 '3k4/3p4/3r4/2P5/2K5/8/8/8 w  - - 0 0'
+Move c6b6 6 '3k4/3p4/1r6/2P5/2K5/8/8/8 w  - - 0 0'
+Move c6a6 8 '3k4/3p4/r7/2P5/2K5/8/8/8 w  - - 0 0'
+Move c6c7 8 '3k4/2rp4/8/2P5/2K5/8/8/8 w  - - 0 0'
+Move c6c8 8 '2rk4/3p4/8/2P5/2K5/8/8/8 w  - - 0 0'
+Move d7d5 8 '3k4/8/2r5/2Pp4/2K5/8/8/8 w  - d6 0 0'
+Move d7d6 7 '3k4/8/2rp4/2P5/2K5/8/8/8 w  - - 0 0'"""
+
+    s = 0
+    print(len(a.splitlines()))
+    for row in a.splitlines():
+        parts, fen, _ = row.split("'")
+        _, move, count = parts.split()
+
+        depth = 1
+        perft_print = subprocess.run(rf'C:\Users\amits\Downloads\perft.exe {depth} "{fen}"', stdout=subprocess.PIPE)
+        match = re.search(rf".*perft.*{depth}.*=\s*(\d*)\s.*", perft_print.stdout.decode("utf-8"))
+        actual = match.groups()[0]
+        s += int(actual)
+        if count != actual:
+            print(move, count, actual, fen)
+    print(s)
+
+
+def find_bad_move():
+    a = """Move e1f1 1445 'rnbq1k1r/pp1Pbppp/2p5/8/2B5/8/PPP1NnPP/RNBQ1K1R b  - - 0 0'
+Move e1f2 1269 'rnbq1k1r/pp1Pbppp/2p5/8/2B5/8/PPP1NKPP/RNBQ3R b  - - 0 0'
+Move e1d2 978 'rnbq1k1r/pp1Pbppp/2p5/8/2B5/8/PPPKNnPP/RNBQ3R b  - - 0 0'
+Move e1g1 1376 'rnbq1k1r/pp1Pbppp/2p5/8/2B5/8/PPP1NnPP/RNBQ1RK1 b  - - 0 0'
+Move h1g1 1311 'rnbq1k1r/pp1Pbppp/2p5/8/2B5/8/PPP1NnPP/RNBQK1R1 b Q - 0 0'
+Move h1f1 1364 'rnbq1k1r/pp1Pbppp/2p5/8/2B5/8/PPP1NnPP/RNBQKR2 b Q - 0 0'
+Move d1d2 1437 'rnbq1k1r/pp1Pbppp/2p5/8/2B5/8/PPPQNnPP/RNB1K2R b KQ - 0 0'
+Move d1d3 1686 'rnbq1k1r/pp1Pbppp/2p5/8/2B5/3Q4/PPP1NnPP/RNB1K2R b KQ - 0 0'
+Move d1d4 1752 'rnbq1k1r/pp1Pbppp/2p5/8/2BQ4/8/PPP1NnPP/RNB1K2R b KQ - 0 0'
+Move d1d5 1689 'rnbq1k1r/pp1Pbppp/2p5/3Q4/2B5/8/PPP1NnPP/RNB1K2R b KQ - 0 0'
+Move d1d6 1501 'rnbq1k1r/pp1Pbppp/2pQ4/8/2B5/8/PPP1NnPP/RNB1K2R b KQ - 0 0'
+Move c1d2 1369 'rnbq1k1r/pp1Pbppp/2p5/8/2B5/8/PPPBNnPP/RN1QK2R b KQ - 0 0'
+Move c1e3 1588 'rnbq1k1r/pp1Pbppp/2p5/8/2B5/4B3/PPP1NnPP/RN1QK2R b KQ - 0 0'
+Move c1f4 1553 'rnbq1k1r/pp1Pbppp/2p5/8/2B2B2/8/PPP1NnPP/RN1QK2R b KQ - 0 0'
+Move c1g5 1423 'rnbq1k1r/pp1Pbppp/2p5/6B1/2B5/8/PPP1NnPP/RN1QK2R b KQ - 0 0'
+Move c1h6 1313 'rnbq1k1r/pp1Pbppp/2p4B/8/2B5/8/PPP1NnPP/RN1QK2R b KQ - 0 0'
+Move b1d2 1175 'rnbq1k1r/pp1Pbppp/2p5/8/2B5/8/PPPNNnPP/R1BQK2R b KQ - 0 0'
+Move b1c3 1468 'rnbq1k1r/pp1Pbppp/2p5/8/2B5/2N5/PPP1NnPP/R1BQK2R b KQ - 0 0'
+Move b1a3 1304 'rnbq1k1r/pp1Pbppp/2p5/8/2B5/N7/PPP1NnPP/R1BQK2R b KQ - 0 0'
+Move h2h3 1372 'rnbq1k1r/pp1Pbppp/2p5/8/2B5/7P/PPP1NnP1/RNBQK2R b KQ - 0 0'
+Move h2h4 1403 'rnbq1k1r/pp1Pbppp/2p5/8/2B4P/8/PPP1NnP1/RNBQK2R b KQ h3 0 0'
+Move g2g3 1309 'rnbq1k1r/pp1Pbppp/2p5/8/2B5/6P1/PPP1Nn1P/RNBQK2R b KQ - 0 0'
+Move g2g4 1338 'rnbq1k1r/pp1Pbppp/2p5/8/2B3P1/8/PPP1Nn1P/RNBQK2R b KQ g3 0 0'
+Move e2g1 1431 'rnbq1k1r/pp1Pbppp/2p5/8/2B5/8/PPP2nPP/RNBQK1NR b KQ - 0 0'
+Move e2g3 1524 'rnbq1k1r/pp1Pbppp/2p5/8/2B5/6N1/PPP2nPP/RNBQK2R b KQ - 0 0'
+Move e2c3 1596 'rnbq1k1r/pp1Pbppp/2p5/8/2B5/2N5/PPP2nPP/RNBQK2R b KQ - 0 0'
+Move e2f4 1556 'rnbq1k1r/pp1Pbppp/2p5/8/2B2N2/8/PPP2nPP/RNBQK2R b KQ - 0 0'
+Move e2d4 1555 'rnbq1k1r/pp1Pbppp/2p5/8/2BN4/8/PPP2nPP/RNBQK2R b KQ - 0 0'
+Move c2c3 1441 'rnbq1k1r/pp1Pbppp/2p5/8/2B5/2P5/PP2NnPP/RNBQK2R b KQ - 0 0'
+Move b2b3 1369 'rnbq1k1r/pp1Pbppp/2p5/8/2B5/1P6/P1P1NnPP/RNBQK2R b KQ - 0 0'
+Move b2b4 1399 'rnbq1k1r/pp1Pbppp/2p5/8/1PB5/8/P1P1NnPP/RNBQK2R b KQ b3 0 0'
+Move a2a3 1374 'rnbq1k1r/pp1Pbppp/2p5/8/2B5/P7/1PP1NnPP/RNBQK2R b KQ - 0 0'
+Move a2a4 1434 'rnbq1k1r/pp1Pbppp/2p5/8/P1B5/8/1PP1NnPP/RNBQK2R b KQ a3 0 0'
+Move c4d3 1270 'rnbq1k1r/pp1Pbppp/2p5/8/8/3B4/PPP1NnPP/RNBQK2R b KQ - 0 0'
+Move c4b3 1276 'rnbq1k1r/pp1Pbppp/2p5/8/8/1B6/PPP1NnPP/RNBQK2R b KQ - 0 0'
+Move c4d5 1376 'rnbq1k1r/pp1Pbppp/2p5/3B4/8/8/PPP1NnPP/RNBQK2R b KQ - 0 0'
+Move c4b5 1333 'rnbq1k1r/pp1Pbppp/2p5/1B6/8/8/PPP1NnPP/RNBQK2R b KQ - 0 0'
+Move c4e6 1439 'rnbq1k1r/pp1Pbppp/2p1B3/8/8/8/PPP1NnPP/RNBQK2R b KQ - 0 0'
+Move c4a6 1257 'rnbq1k1r/pp1Pbppp/B1p5/8/8/8/PPP1NnPP/RNBQK2R b KQ - 0 0'
+Move c4f7 1329 'rnbq1k1r/pp1PbBpp/2p5/8/8/8/PPP1NnPP/RNBQK2R b KQ - 0 0'
+Move d7c8 1460 'rnQq1k1r/pp2bppp/2p5/8/2B5/8/PPP1NnPP/RNBQK2R b KQ - 0 0'
+Move d7c8 1297 'rnRq1k1r/pp2bppp/2p5/8/2B5/8/PPP1NnPP/RNBQK2R b KQ - 0 0'
+Move d7c8 1669 'rnBq1k1r/pp2bppp/2p5/8/2B5/8/PPP1NnPP/RNBQK2R b KQ - 0 0'
+Move d7c8 1608 'rnNq1k1r/pp2bppp/2p5/8/2B5/8/PPP1NnPP/RNBQK2R b KQ - 0 0'"""
+
+    b = """
+    2. e1g1 moves =       1376 ( 0.000 sec)
+2. h2h3 moves =       1371 ( 0.000 sec)
+2. h2h4 moves =       1402 ( 0.000 sec)
+2. g2g3 moves =       1308 ( 0.001 sec)
+2. g2g4 moves =       1337 ( 0.000 sec)
+2. c2c3 moves =       1440 ( 0.001 sec)
+2. b2b3 moves =       1368 ( 0.000 sec)
+2. b2b4 moves =       1398 ( 0.001 sec)
+2. a2a3 moves =       1373 ( 0.000 sec)
+2. a2a4 moves =       1433 ( 0.001 sec)
+2. d7c8 moves =       1459 ( 0.000 sec)
+2. d7c8 moves =       1296 ( 0.001 sec)
+2. d7c8 moves =       1668 ( 0.000 sec)
+2. d7c8 moves =       1607 ( 0.001 sec)
+2. b1a3 moves =       1303 ( 0.000 sec)
+2. b1c3 moves =       1467 ( 0.000 sec)
+2. b1d2 moves =       1174 ( 0.001 sec)
+2. e2c3 moves =       1595 ( 0.000 sec)
+2. e2d4 moves =       1554 ( 0.002 sec)
+2. e2f4 moves =       1555 ( 0.001 sec)
+2. e2g3 moves =       1523 ( 0.003 sec)
+2. e2g1 moves =       1431 ( 0.000 sec)
+2. c4b5 moves =       1332 ( 0.001 sec)
+2. c4a6 moves =       1256 ( 0.001 sec)
+2. c4d3 moves =       1269 ( 0.000 sec)
+2. c4d5 moves =       1375 ( 0.000 sec)
+2. c4e6 moves =       1438 ( 0.001 sec)
+2. c4f7 moves =       1328 ( 0.000 sec)
+2. c4b3 moves =       1275 ( 0.001 sec)
+2. c1d2 moves =       1368 ( 0.000 sec)
+2. c1e3 moves =       1587 ( 0.001 sec)
+2. c1f4 moves =       1552 ( 0.000 sec)
+2. c1g5 moves =       1422 ( 0.001 sec)
+2. c1h6 moves =       1312 ( 0.000 sec)
+2. d1d2 moves =       1436 ( 0.001 sec)
+2. d1d3 moves =       1685 ( 0.000 sec)
+2. d1d4 moves =       1751 ( 0.001 sec)
+2. d1d5 moves =       1688 ( 0.000 sec)
+2. d1d6 moves =       1500 ( 0.001 sec)
+2. h1g1 moves =       1311 ( 0.000 sec)
+2. h1f1 moves =       1364 ( 0.001 sec)
+2. e1f1 moves =       1445 ( 0.000 sec)
+2. e1f2 moves =       1269 ( 0.001 sec)
+2. e1d2 moves =        978 ( 0.002 sec)
+    """
+
+    for row in a.splitlines():
+        parts, fen, _ = row.split("'")
+        _, move, count = parts.split()
+
+        for actual_row in b.splitlines():
+            if match := re.search(rf"{move}.*=\s*(\d*)\s.*", actual_row):
+                actual = match.groups()[0]
+                if count == actual:
+                    break
+        else:
+            print(move, count)
+
+
+def find_diff_in_moves():
+    a = """Moves: f8g8 e1f1
+Moves: f8g8 e1f2
+Moves: f8g8 e1g1
+Moves: f8g8 h1g1
+Moves: f8g8 h1f1
+Moves: f8g8 b1c3
+Moves: f8g8 b1a3
+Moves: f8g8 h2h3
+Moves: f8g8 h2h4
+Moves: f8g8 g2g3
+Moves: f8g8 g2g4
+Moves: f8g8 e2g1
+Moves: f8g8 e2g3
+Moves: f8g8 e2c3
+Moves: f8g8 e2f4
+Moves: f8g8 e2d4
+Moves: f8g8 d2d1
+Moves: f8g8 d2e3
+Moves: f8g8 d2d3
+Moves: f8g8 d2c3
+Moves: f8g8 d2f4
+Moves: f8g8 d2d4
+Moves: f8g8 d2b4
+Moves: f8g8 d2g5
+Moves: f8g8 d2d5
+Moves: f8g8 d2a5
+Moves: f8g8 d2h6
+Moves: f8g8 d2d6
+Moves: f8g8 c2c3
+Moves: f8g8 b2b3
+Moves: f8g8 b2b4
+Moves: f8g8 a2a3
+Moves: f8g8 a2a4
+Moves: f8g8 c4d3
+Moves: f8g8 c4b3
+Moves: f8g8 c4d5
+Moves: f8g8 c4b5
+Moves: f8g8 c4e6
+Moves: f8g8 c4a6
+Moves: f8g8 c4f7
+Moves: f8g8 d7c8
+Moves: f8g8 d7c8
+Moves: f8g8 d7c8
+Moves: f8g8 d7c8
+Moves: f2h1 e1f1
+Moves: f2h1 e1d1
+Moves: f2h1 e1g1
+Moves: f2h1 b1c3
+Moves: f2h1 b1a3
+Moves: f2h1 h2h3
+Moves: f2h1 h2h4
+Moves: f2h1 g2g3
+Moves: f2h1 g2g4
+Moves: f2h1 e2g1
+Moves: f2h1 e2g3
+Moves: f2h1 e2c3
+Moves: f2h1 e2f4
+Moves: f2h1 e2d4
+Moves: f2h1 d2d1
+Moves: f2h1 d2e3
+Moves: f2h1 d2d3
+Moves: f2h1 d2c3
+Moves: f2h1 d2f4
+Moves: f2h1 d2d4
+Moves: f2h1 d2b4
+Moves: f2h1 d2g5
+Moves: f2h1 d2d5
+Moves: f2h1 d2a5
+Moves: f2h1 d2h6
+Moves: f2h1 d2d6
+Moves: f2h1 c2c3
+Moves: f2h1 b2b3
+Moves: f2h1 b2b4
+Moves: f2h1 a2a3
+Moves: f2h1 a2a4
+Moves: f2h1 c4d3
+Moves: f2h1 c4b3
+Moves: f2h1 c4d5
+Moves: f2h1 c4b5
+Moves: f2h1 c4e6
+Moves: f2h1 c4a6
+Moves: f2h1 c4f7
+Moves: f2h1 d7c8
+Moves: f2h1 d7c8
+Moves: f2h1 d7c8
+Moves: f2h1 d7c8
+Moves: f2d1 e1f1
+Moves: f2d1 e1d1
+Moves: f2d1 e1g1
+Moves: f2d1 h1g1
+Moves: f2d1 h1f1
+Moves: f2d1 b1c3
+Moves: f2d1 b1a3
+Moves: f2d1 h2h3
+Moves: f2d1 h2h4
+Moves: f2d1 g2g3
+Moves: f2d1 g2g4
+Moves: f2d1 e2g1
+Moves: f2d1 e2g3
+Moves: f2d1 e2c3
+Moves: f2d1 e2f4
+Moves: f2d1 e2d4
+Moves: f2d1 d2d1
+Moves: f2d1 d2e3
+Moves: f2d1 d2d3
+Moves: f2d1 d2c3
+Moves: f2d1 d2f4
+Moves: f2d1 d2d4
+Moves: f2d1 d2b4
+Moves: f2d1 d2g5
+Moves: f2d1 d2d5
+Moves: f2d1 d2a5
+Moves: f2d1 d2h6
+Moves: f2d1 d2d6
+Moves: f2d1 c2c3
+Moves: f2d1 b2b3
+Moves: f2d1 b2b4
+Moves: f2d1 a2a3
+Moves: f2d1 a2a4
+Moves: f2d1 c4d3
+Moves: f2d1 c4b3
+Moves: f2d1 c4d5
+Moves: f2d1 c4b5
+Moves: f2d1 c4e6
+Moves: f2d1 c4a6
+Moves: f2d1 c4f7
+Moves: f2d1 d7c8
+Moves: f2d1 d7c8
+Moves: f2d1 d7c8
+Moves: f2d1 d7c8
+Moves: f2h3 e1f1
+Moves: f2h3 e1d1
+Moves: f2h3 h1g1
+Moves: f2h3 h1f1
+Moves: f2h3 b1c3
+Moves: f2h3 b1a3
+Moves: f2h3 g2h3
+Moves: f2h3 g2g3
+Moves: f2h3 g2g4
+Moves: f2h3 e2g1
+Moves: f2h3 e2g3
+Moves: f2h3 e2c3
+Moves: f2h3 e2f4
+Moves: f2h3 e2d4
+Moves: f2h3 d2d1
+Moves: f2h3 d2e3
+Moves: f2h3 d2d3
+Moves: f2h3 d2c3
+Moves: f2h3 d2f4
+Moves: f2h3 d2d4
+Moves: f2h3 d2b4
+Moves: f2h3 d2g5
+Moves: f2h3 d2d5
+Moves: f2h3 d2a5
+Moves: f2h3 d2h6
+Moves: f2h3 d2d6
+Moves: f2h3 c2c3
+Moves: f2h3 b2b3
+Moves: f2h3 b2b4
+Moves: f2h3 a2a3
+Moves: f2h3 a2a4
+Moves: f2h3 c4d3
+Moves: f2h3 c4b3
+Moves: f2h3 c4d5
+Moves: f2h3 c4b5
+Moves: f2h3 c4e6
+Moves: f2h3 c4a6
+Moves: f2h3 c4f7
+Moves: f2h3 d7c8
+Moves: f2h3 d7c8
+Moves: f2h3 d7c8
+Moves: f2h3 d7c8
+Moves: f2d3 e1f1
+Moves: f2d3 e1d1
+Moves: f2d3 d2d3
+Moves: f2d3 c2d3
+Moves: f2d3 c4d3
+Moves: f2g4 e1f1
+Moves: f2g4 e1d1
+Moves: f2g4 e1g1
+Moves: f2g4 h1g1
+Moves: f2g4 h1f1
+Moves: f2g4 b1c3
+Moves: f2g4 b1a3
+Moves: f2g4 h2h3
+Moves: f2g4 h2h4
+Moves: f2g4 g2g3
+Moves: f2g4 e2g1
+Moves: f2g4 e2g3
+Moves: f2g4 e2c3
+Moves: f2g4 e2f4
+Moves: f2g4 e2d4
+Moves: f2g4 d2d1
+Moves: f2g4 d2e3
+Moves: f2g4 d2d3
+Moves: f2g4 d2c3
+Moves: f2g4 d2f4
+Moves: f2g4 d2d4
+Moves: f2g4 d2b4
+Moves: f2g4 d2g5
+Moves: f2g4 d2d5
+Moves: f2g4 d2a5
+Moves: f2g4 d2h6
+Moves: f2g4 d2d6
+Moves: f2g4 c2c3
+Moves: f2g4 b2b3
+Moves: f2g4 b2b4
+Moves: f2g4 a2a3
+Moves: f2g4 a2a4
+Moves: f2g4 c4d3
+Moves: f2g4 c4b3
+Moves: f2g4 c4d5
+Moves: f2g4 c4b5
+Moves: f2g4 c4e6
+Moves: f2g4 c4a6
+Moves: f2g4 c4f7
+Moves: f2g4 d7c8
+Moves: f2g4 d7c8
+Moves: f2g4 d7c8
+Moves: f2g4 d7c8
+Moves: f2e4 e1f1
+Moves: f2e4 e1d1
+Moves: f2e4 e1g1
+Moves: f2e4 h1g1
+Moves: f2e4 h1f1
+Moves: f2e4 b1c3
+Moves: f2e4 b1a3
+Moves: f2e4 h2h3
+Moves: f2e4 h2h4
+Moves: f2e4 g2g3
+Moves: f2e4 g2g4
+Moves: f2e4 e2g1
+Moves: f2e4 e2g3
+Moves: f2e4 e2c3
+Moves: f2e4 e2f4
+Moves: f2e4 e2d4
+Moves: f2e4 d2d1
+Moves: f2e4 d2e3
+Moves: f2e4 d2d3
+Moves: f2e4 d2c3
+Moves: f2e4 d2f4
+Moves: f2e4 d2d4
+Moves: f2e4 d2b4
+Moves: f2e4 d2g5
+Moves: f2e4 d2d5
+Moves: f2e4 d2a5
+Moves: f2e4 d2h6
+Moves: f2e4 d2d6
+Moves: f2e4 c2c3
+Moves: f2e4 b2b3
+Moves: f2e4 b2b4
+Moves: f2e4 a2a3
+Moves: f2e4 a2a4
+Moves: f2e4 c4d3
+Moves: f2e4 c4b3
+Moves: f2e4 c4d5
+Moves: f2e4 c4b5
+Moves: f2e4 c4e6
+Moves: f2e4 c4a6
+Moves: f2e4 c4f7
+Moves: f2e4 d7c8
+Moves: f2e4 d7c8
+Moves: f2e4 d7c8
+Moves: f2e4 d7c8
+Moves: c6c5 e1f1
+Moves: c6c5 e1f2
+Moves: c6c5 e1g1
+Moves: c6c5 h1g1
+Moves: c6c5 h1f1
+Moves: c6c5 b1c3
+Moves: c6c5 b1a3
+Moves: c6c5 h2h3
+Moves: c6c5 h2h4
+Moves: c6c5 g2g3
+Moves: c6c5 g2g4
+Moves: c6c5 e2g1
+Moves: c6c5 e2g3
+Moves: c6c5 e2c3
+Moves: c6c5 e2f4
+Moves: c6c5 e2d4
+Moves: c6c5 d2d1
+Moves: c6c5 d2e3
+Moves: c6c5 d2d3
+Moves: c6c5 d2c3
+Moves: c6c5 d2f4
+Moves: c6c5 d2d4
+Moves: c6c5 d2b4
+Moves: c6c5 d2g5
+Moves: c6c5 d2d5
+Moves: c6c5 d2a5
+Moves: c6c5 d2h6
+Moves: c6c5 d2d6
+Moves: c6c5 c2c3
+Moves: c6c5 b2b3
+Moves: c6c5 b2b4
+Moves: c6c5 a2a3
+Moves: c6c5 a2a4
+Moves: c6c5 c4d3
+Moves: c6c5 c4b3
+Moves: c6c5 c4d5
+Moves: c6c5 c4b5
+Moves: c6c5 c4e6
+Moves: c6c5 c4a6
+Moves: c6c5 c4f7
+Moves: c6c5 d7c8
+Moves: c6c5 d7c8
+Moves: c6c5 d7c8
+Moves: c6c5 d7c8
+Moves: h7h5 e1f1
+Moves: h7h5 e1f2
+Moves: h7h5 e1g1
+Moves: h7h5 h1g1
+Moves: h7h5 h1f1
+Moves: h7h5 b1c3
+Moves: h7h5 b1a3
+Moves: h7h5 h2h3
+Moves: h7h5 h2h4
+Moves: h7h5 g2g3
+Moves: h7h5 g2g4
+Moves: h7h5 e2g1
+Moves: h7h5 e2g3
+Moves: h7h5 e2c3
+Moves: h7h5 e2f4
+Moves: h7h5 e2d4
+Moves: h7h5 d2d1
+Moves: h7h5 d2e3
+Moves: h7h5 d2d3
+Moves: h7h5 d2c3
+Moves: h7h5 d2f4
+Moves: h7h5 d2d4
+Moves: h7h5 d2b4
+Moves: h7h5 d2g5
+Moves: h7h5 d2d5
+Moves: h7h5 d2a5
+Moves: h7h5 d2h6
+Moves: h7h5 d2d6
+Moves: h7h5 c2c3
+Moves: h7h5 b2b3
+Moves: h7h5 b2b4
+Moves: h7h5 a2a3
+Moves: h7h5 a2a4
+Moves: h7h5 c4d3
+Moves: h7h5 c4b3
+Moves: h7h5 c4d5
+Moves: h7h5 c4b5
+Moves: h7h5 c4e6
+Moves: h7h5 c4a6
+Moves: h7h5 c4f7
+Moves: h7h5 d7c8
+Moves: h7h5 d7c8
+Moves: h7h5 d7c8
+Moves: h7h5 d7c8
+Moves: h7h6 e1f1
+Moves: h7h6 e1f2
+Moves: h7h6 e1g1
+Moves: h7h6 h1g1
+Moves: h7h6 h1f1
+Moves: h7h6 b1c3
+Moves: h7h6 b1a3
+Moves: h7h6 h2h3
+Moves: h7h6 h2h4
+Moves: h7h6 g2g3
+Moves: h7h6 g2g4
+Moves: h7h6 e2g1
+Moves: h7h6 e2g3
+Moves: h7h6 e2c3
+Moves: h7h6 e2f4
+Moves: h7h6 e2d4
+Moves: h7h6 d2d1
+Moves: h7h6 d2e3
+Moves: h7h6 d2d3
+Moves: h7h6 d2c3
+Moves: h7h6 d2f4
+Moves: h7h6 d2d4
+Moves: h7h6 d2b4
+Moves: h7h6 d2g5
+Moves: h7h6 d2d5
+Moves: h7h6 d2a5
+Moves: h7h6 d2h6
+Moves: h7h6 d2d6
+Moves: h7h6 c2c3
+Moves: h7h6 b2b3
+Moves: h7h6 b2b4
+Moves: h7h6 a2a3
+Moves: h7h6 a2a4
+Moves: h7h6 c4d3
+Moves: h7h6 c4b3
+Moves: h7h6 c4d5
+Moves: h7h6 c4b5
+Moves: h7h6 c4e6
+Moves: h7h6 c4a6
+Moves: h7h6 c4f7
+Moves: h7h6 d7c8
+Moves: h7h6 d7c8
+Moves: h7h6 d7c8
+Moves: h7h6 d7c8
+Moves: g7g5 e1f1
+Moves: g7g5 e1f2
+Moves: g7g5 e1g1
+Moves: g7g5 h1g1
+Moves: g7g5 h1f1
+Moves: g7g5 b1c3
+Moves: g7g5 b1a3
+Moves: g7g5 h2h3
+Moves: g7g5 h2h4
+Moves: g7g5 g2g3
+Moves: g7g5 g2g4
+Moves: g7g5 e2g1
+Moves: g7g5 e2g3
+Moves: g7g5 e2c3
+Moves: g7g5 e2f4
+Moves: g7g5 e2d4
+Moves: g7g5 d2d1
+Moves: g7g5 d2e3
+Moves: g7g5 d2d3
+Moves: g7g5 d2c3
+Moves: g7g5 d2f4
+Moves: g7g5 d2d4
+Moves: g7g5 d2b4
+Moves: g7g5 d2g5
+Moves: g7g5 d2d5
+Moves: g7g5 d2a5
+Moves: g7g5 d2d6
+Moves: g7g5 c2c3
+Moves: g7g5 b2b3
+Moves: g7g5 b2b4
+Moves: g7g5 a2a3
+Moves: g7g5 a2a4
+Moves: g7g5 c4d3
+Moves: g7g5 c4b3
+Moves: g7g5 c4d5
+Moves: g7g5 c4b5
+Moves: g7g5 c4e6
+Moves: g7g5 c4a6
+Moves: g7g5 c4f7
+Moves: g7g5 d7c8
+Moves: g7g5 d7c8
+Moves: g7g5 d7c8
+Moves: g7g5 d7c8
+Moves: g7g6 e1f1
+Moves: g7g6 e1f2
+Moves: g7g6 e1g1
+Moves: g7g6 h1g1
+Moves: g7g6 h1f1
+Moves: g7g6 b1c3
+Moves: g7g6 b1a3
+Moves: g7g6 h2h3
+Moves: g7g6 h2h4
+Moves: g7g6 g2g3
+Moves: g7g6 g2g4
+Moves: g7g6 e2g1
+Moves: g7g6 e2g3
+Moves: g7g6 e2c3
+Moves: g7g6 e2f4
+Moves: g7g6 e2d4
+Moves: g7g6 d2d1
+Moves: g7g6 d2e3
+Moves: g7g6 d2d3
+Moves: g7g6 d2c3
+Moves: g7g6 d2f4
+Moves: g7g6 d2d4
+Moves: g7g6 d2b4
+Moves: g7g6 d2g5
+Moves: g7g6 d2d5
+Moves: g7g6 d2a5
+Moves: g7g6 d2h6
+Moves: g7g6 d2d6
+Moves: g7g6 c2c3
+Moves: g7g6 b2b3
+Moves: g7g6 b2b4
+Moves: g7g6 a2a3
+Moves: g7g6 a2a4
+Moves: g7g6 c4d3
+Moves: g7g6 c4b3
+Moves: g7g6 c4d5
+Moves: g7g6 c4b5
+Moves: g7g6 c4e6
+Moves: g7g6 c4a6
+Moves: g7g6 c4f7
+Moves: g7g6 d7c8
+Moves: g7g6 d7c8
+Moves: g7g6 d7c8
+Moves: g7g6 d7c8
+Moves: f7f5 e1f1
+Moves: f7f5 e1f2
+Moves: f7f5 e1g1
+Moves: f7f5 h1g1
+Moves: f7f5 h1f1
+Moves: f7f5 b1c3
+Moves: f7f5 b1a3
+Moves: f7f5 h2h3
+Moves: f7f5 h2h4
+Moves: f7f5 g2g3
+Moves: f7f5 g2g4
+Moves: f7f5 e2g1
+Moves: f7f5 e2g3
+Moves: f7f5 e2c3
+Moves: f7f5 e2f4
+Moves: f7f5 e2d4
+Moves: f7f5 d2d1
+Moves: f7f5 d2e3
+Moves: f7f5 d2d3
+Moves: f7f5 d2c3
+Moves: f7f5 d2f4
+Moves: f7f5 d2d4
+Moves: f7f5 d2b4
+Moves: f7f5 d2g5
+Moves: f7f5 d2d5
+Moves: f7f5 d2a5
+Moves: f7f5 d2h6
+Moves: f7f5 d2d6
+Moves: f7f5 c2c3
+Moves: f7f5 b2b3
+Moves: f7f5 b2b4
+Moves: f7f5 a2a3
+Moves: f7f5 a2a4
+Moves: f7f5 c4d3
+Moves: f7f5 c4b3
+Moves: f7f5 c4d5
+Moves: f7f5 c4b5
+Moves: f7f5 c4e6
+Moves: f7f5 c4a6
+Moves: f7f5 c4f7
+Moves: f7f5 c4g8
+Moves: f7f5 d7c8
+Moves: f7f5 d7c8
+Moves: f7f5 d7c8
+Moves: f7f5 d7c8
+Moves: f7f6 e1f1
+Moves: f7f6 e1f2
+Moves: f7f6 e1g1
+Moves: f7f6 h1g1
+Moves: f7f6 h1f1
+Moves: f7f6 b1c3
+Moves: f7f6 b1a3
+Moves: f7f6 h2h3
+Moves: f7f6 h2h4
+Moves: f7f6 g2g3
+Moves: f7f6 g2g4
+Moves: f7f6 e2g1
+Moves: f7f6 e2g3
+Moves: f7f6 e2c3
+Moves: f7f6 e2f4
+Moves: f7f6 e2d4
+Moves: f7f6 d2d1
+Moves: f7f6 d2e3
+Moves: f7f6 d2d3
+Moves: f7f6 d2c3
+Moves: f7f6 d2f4
+Moves: f7f6 d2d4
+Moves: f7f6 d2b4
+Moves: f7f6 d2g5
+Moves: f7f6 d2d5
+Moves: f7f6 d2a5
+Moves: f7f6 d2h6
+Moves: f7f6 d2d6
+Moves: f7f6 c2c3
+Moves: f7f6 b2b3
+Moves: f7f6 b2b4
+Moves: f7f6 a2a3
+Moves: f7f6 a2a4
+Moves: f7f6 c4d3
+Moves: f7f6 c4b3
+Moves: f7f6 c4d5
+Moves: f7f6 c4b5
+Moves: f7f6 c4e6
+Moves: f7f6 c4a6
+Moves: f7f6 c4f7
+Moves: f7f6 c4g8
+Moves: f7f6 d7c8
+Moves: f7f6 d7c8
+Moves: f7f6 d7c8
+Moves: f7f6 d7c8
+Moves: e7a3 e1f1
+Moves: e7a3 e1f2
+Moves: e7a3 e1g1
+Moves: e7a3 h1g1
+Moves: e7a3 h1f1
+Moves: e7a3 b1c3
+Moves: e7a3 b1a3
+Moves: e7a3 h2h3
+Moves: e7a3 h2h4
+Moves: e7a3 g2g3
+Moves: e7a3 g2g4
+Moves: e7a3 e2g1
+Moves: e7a3 e2g3
+Moves: e7a3 e2c3
+Moves: e7a3 e2f4
+Moves: e7a3 e2d4
+Moves: e7a3 d2d1
+Moves: e7a3 d2e3
+Moves: e7a3 d2d3
+Moves: e7a3 d2c3
+Moves: e7a3 d2f4
+Moves: e7a3 d2d4
+Moves: e7a3 d2b4
+Moves: e7a3 d2g5
+Moves: e7a3 d2d5
+Moves: e7a3 d2a5
+Moves: e7a3 d2h6
+Moves: e7a3 d2d6
+Moves: e7a3 c2c3
+Moves: e7a3 b2b3
+Moves: e7a3 b2a3
+Moves: e7a3 b2b4
+Moves: e7a3 c4d3
+Moves: e7a3 c4b3
+Moves: e7a3 c4d5
+Moves: e7a3 c4b5
+Moves: e7a3 c4e6
+Moves: e7a3 c4a6
+Moves: e7a3 c4f7
+Moves: e7a3 d7c8
+Moves: e7a3 d7c8
+Moves: e7a3 d7c8
+Moves: e7a3 d7c8
+Moves: e7h4 e1f1
+Moves: e7h4 e1g1
+Moves: e7h4 h1g1
+Moves: e7h4 h1f1
+Moves: e7h4 b1c3
+Moves: e7h4 b1a3
+Moves: e7h4 h2h3
+Moves: e7h4 g2g3
+Moves: e7h4 g2g4
+Moves: e7h4 e2g1
+Moves: e7h4 e2g3
+Moves: e7h4 e2c3
+Moves: e7h4 e2f4
+Moves: e7h4 e2d4
+Moves: e7h4 d2d1
+Moves: e7h4 d2e3
+Moves: e7h4 d2d3
+Moves: e7h4 d2c3
+Moves: e7h4 d2f4
+Moves: e7h4 d2d4
+Moves: e7h4 d2b4
+Moves: e7h4 d2g5
+Moves: e7h4 d2d5
+Moves: e7h4 d2a5
+Moves: e7h4 d2h6
+Moves: e7h4 d2d6
+Moves: e7h4 c2c3
+Moves: e7h4 b2b3
+Moves: e7h4 b2b4
+Moves: e7h4 a2a3
+Moves: e7h4 a2a4
+Moves: e7h4 c4d3
+Moves: e7h4 c4b3
+Moves: e7h4 c4d5
+Moves: e7h4 c4b5
+Moves: e7h4 c4e6
+Moves: e7h4 c4a6
+Moves: e7h4 c4f7
+Moves: e7h4 d7c8
+Moves: e7h4 d7c8
+Moves: e7h4 d7c8
+Moves: e7h4 d7c8
+Moves: e7b4 e1f1
+Moves: e7b4 e1f2
+Moves: e7b4 e1g1
+Moves: e7b4 d2c3
+Moves: e7b4 d2b4
+Moves: e7b4 h1g1
+Moves: e7b4 h1f1
+Moves: e7b4 b1c3
+Moves: e7b4 b1a3
+Moves: e7b4 h2h3
+Moves: e7b4 h2h4
+Moves: e7b4 g2g3
+Moves: e7b4 g2g4
+Moves: e7b4 e2g1
+Moves: e7b4 e2g3
+Moves: e7b4 e2c3
+Moves: e7b4 e2f4
+Moves: e7b4 e2d4
+Moves: e7b4 c2c3
+Moves: e7b4 b2b3
+Moves: e7b4 a2a3
+Moves: e7b4 a2a4
+Moves: e7b4 c4d3
+Moves: e7b4 c4b3
+Moves: e7b4 c4d5
+Moves: e7b4 c4b5
+Moves: e7b4 c4e6
+Moves: e7b4 c4a6
+Moves: e7b4 c4f7
+Moves: e7b4 d7c8
+Moves: e7b4 d7c8
+Moves: e7b4 d7c8
+Moves: e7b4 d7c8
+Moves: e7g5 e1f1
+Moves: e7g5 e1f2
+Moves: e7g5 e1g1
+Moves: e7g5 h1g1
+Moves: e7g5 h1f1
+Moves: e7g5 b1c3
+Moves: e7g5 b1a3
+Moves: e7g5 h2h3
+Moves: e7g5 h2h4
+Moves: e7g5 g2g3
+Moves: e7g5 g2g4
+Moves: e7g5 e2g1
+Moves: e7g5 e2g3
+Moves: e7g5 e2c3
+Moves: e7g5 e2f4
+Moves: e7g5 e2d4
+Moves: e7g5 d2d1
+Moves: e7g5 d2e3
+Moves: e7g5 d2d3
+Moves: e7g5 d2c3
+Moves: e7g5 d2f4
+Moves: e7g5 d2d4
+Moves: e7g5 d2b4
+Moves: e7g5 d2g5
+Moves: e7g5 d2d5
+Moves: e7g5 d2a5
+Moves: e7g5 d2d6
+Moves: e7g5 c2c3
+Moves: e7g5 b2b3
+Moves: e7g5 b2b4
+Moves: e7g5 a2a3
+Moves: e7g5 a2a4
+Moves: e7g5 c4d3
+Moves: e7g5 c4b3
+Moves: e7g5 c4d5
+Moves: e7g5 c4b5
+Moves: e7g5 c4e6
+Moves: e7g5 c4a6
+Moves: e7g5 c4f7
+Moves: e7g5 d7c8
+Moves: e7g5 d7c8
+Moves: e7g5 d7c8
+Moves: e7g5 d7c8
+Moves: e7c5 e1f1
+Moves: e7c5 e1g1
+Moves: e7c5 h1g1
+Moves: e7c5 h1f1
+Moves: e7c5 b1c3
+Moves: e7c5 b1a3
+Moves: e7c5 h2h3
+Moves: e7c5 h2h4
+Moves: e7c5 g2g3
+Moves: e7c5 g2g4
+Moves: e7c5 e2g1
+Moves: e7c5 e2g3
+Moves: e7c5 e2c3
+Moves: e7c5 e2f4
+Moves: e7c5 e2d4
+Moves: e7c5 d2d1
+Moves: e7c5 d2e3
+Moves: e7c5 d2d3
+Moves: e7c5 d2c3
+Moves: e7c5 d2f4
+Moves: e7c5 d2d4
+Moves: e7c5 d2b4
+Moves: e7c5 d2g5
+Moves: e7c5 d2d5
+Moves: e7c5 d2a5
+Moves: e7c5 d2h6
+Moves: e7c5 d2d6
+Moves: e7c5 c2c3
+Moves: e7c5 b2b3
+Moves: e7c5 b2b4
+Moves: e7c5 a2a3
+Moves: e7c5 a2a4
+Moves: e7c5 c4d3
+Moves: e7c5 c4b3
+Moves: e7c5 c4d5
+Moves: e7c5 c4b5
+Moves: e7c5 c4e6
+Moves: e7c5 c4a6
+Moves: e7c5 c4f7
+Moves: e7c5 d7c8
+Moves: e7c5 d7c8
+Moves: e7c5 d7c8
+Moves: e7c5 d7c8
+Moves: e7f6 e1f1
+Moves: e7f6 e1f2
+Moves: e7f6 e1g1
+Moves: e7f6 h1g1
+Moves: e7f6 h1f1
+Moves: e7f6 b1c3
+Moves: e7f6 b1a3
+Moves: e7f6 h2h3
+Moves: e7f6 h2h4
+Moves: e7f6 g2g3
+Moves: e7f6 g2g4
+Moves: e7f6 e2g1
+Moves: e7f6 e2g3
+Moves: e7f6 e2c3
+Moves: e7f6 e2f4
+Moves: e7f6 e2d4
+Moves: e7f6 d2d1
+Moves: e7f6 d2e3
+Moves: e7f6 d2d3
+Moves: e7f6 d2c3
+Moves: e7f6 d2f4
+Moves: e7f6 d2d4
+Moves: e7f6 d2b4
+Moves: e7f6 d2g5
+Moves: e7f6 d2d5
+Moves: e7f6 d2a5
+Moves: e7f6 d2h6
+Moves: e7f6 d2d6
+Moves: e7f6 c2c3
+Moves: e7f6 b2b3
+Moves: e7f6 b2b4
+Moves: e7f6 a2a3
+Moves: e7f6 a2a4
+Moves: e7f6 c4d3
+Moves: e7f6 c4b3
+Moves: e7f6 c4d5
+Moves: e7f6 c4b5
+Moves: e7f6 c4e6
+Moves: e7f6 c4a6
+Moves: e7f6 c4f7
+Moves: e7f6 d7c8
+Moves: e7f6 d7c8
+Moves: e7f6 d7c8
+Moves: e7f6 d7c8
+Moves: e7d6 e1f1
+Moves: e7d6 e1f2
+Moves: e7d6 e1g1
+Moves: e7d6 h1g1
+Moves: e7d6 h1f1
+Moves: e7d6 b1c3
+Moves: e7d6 b1a3
+Moves: e7d6 h2h3
+Moves: e7d6 h2h4
+Moves: e7d6 g2g3
+Moves: e7d6 g2g4
+Moves: e7d6 e2g1
+Moves: e7d6 e2g3
+Moves: e7d6 e2c3
+Moves: e7d6 e2f4
+Moves: e7d6 e2d4
+Moves: e7d6 d2d1
+Moves: e7d6 d2e3
+Moves: e7d6 d2d3
+Moves: e7d6 d2c3
+Moves: e7d6 d2f4
+Moves: e7d6 d2d4
+Moves: e7d6 d2b4
+Moves: e7d6 d2g5
+Moves: e7d6 d2d5
+Moves: e7d6 d2a5
+Moves: e7d6 d2h6
+Moves: e7d6 d2d6
+Moves: e7d6 c2c3
+Moves: e7d6 b2b3
+Moves: e7d6 b2b4
+Moves: e7d6 a2a3
+Moves: e7d6 a2a4
+Moves: e7d6 c4d3
+Moves: e7d6 c4b3
+Moves: e7d6 c4d5
+Moves: e7d6 c4b5
+Moves: e7d6 c4e6
+Moves: e7d6 c4a6
+Moves: e7d6 c4f7
+Moves: e7d6 d7c8
+Moves: e7d6 d7c8
+Moves: e7d6 d7c8
+Moves: e7d6 d7c8
+Moves: b7b5 e1f1
+Moves: b7b5 e1f2
+Moves: b7b5 e1g1
+Moves: b7b5 h1g1
+Moves: b7b5 h1f1
+Moves: b7b5 b1c3
+Moves: b7b5 b1a3
+Moves: b7b5 h2h3
+Moves: b7b5 h2h4
+Moves: b7b5 g2g3
+Moves: b7b5 g2g4
+Moves: b7b5 e2g1
+Moves: b7b5 e2g3
+Moves: b7b5 e2c3
+Moves: b7b5 e2f4
+Moves: b7b5 e2d4
+Moves: b7b5 d2d1
+Moves: b7b5 d2e3
+Moves: b7b5 d2d3
+Moves: b7b5 d2c3
+Moves: b7b5 d2f4
+Moves: b7b5 d2d4
+Moves: b7b5 d2b4
+Moves: b7b5 d2g5
+Moves: b7b5 d2d5
+Moves: b7b5 d2a5
+Moves: b7b5 d2h6
+Moves: b7b5 d2d6
+Moves: b7b5 c2c3
+Moves: b7b5 b2b3
+Moves: b7b5 b2b4
+Moves: b7b5 a2a3
+Moves: b7b5 a2a4
+Moves: b7b5 c4d3
+Moves: b7b5 c4b3
+Moves: b7b5 c4d5
+Moves: b7b5 c4b5
+Moves: b7b5 c4e6
+Moves: b7b5 c4f7
+Moves: b7b5 d7c8
+Moves: b7b5 d7c8
+Moves: b7b5 d7c8
+Moves: b7b5 d7c8
+Moves: b7b6 e1f1
+Moves: b7b6 e1f2
+Moves: b7b6 e1g1
+Moves: b7b6 h1g1
+Moves: b7b6 h1f1
+Moves: b7b6 b1c3
+Moves: b7b6 b1a3
+Moves: b7b6 h2h3
+Moves: b7b6 h2h4
+Moves: b7b6 g2g3
+Moves: b7b6 g2g4
+Moves: b7b6 e2g1
+Moves: b7b6 e2g3
+Moves: b7b6 e2c3
+Moves: b7b6 e2f4
+Moves: b7b6 e2d4
+Moves: b7b6 d2d1
+Moves: b7b6 d2e3
+Moves: b7b6 d2d3
+Moves: b7b6 d2c3
+Moves: b7b6 d2f4
+Moves: b7b6 d2d4
+Moves: b7b6 d2b4
+Moves: b7b6 d2g5
+Moves: b7b6 d2d5
+Moves: b7b6 d2a5
+Moves: b7b6 d2h6
+Moves: b7b6 d2d6
+Moves: b7b6 c2c3
+Moves: b7b6 b2b3
+Moves: b7b6 b2b4
+Moves: b7b6 a2a3
+Moves: b7b6 a2a4
+Moves: b7b6 c4d3
+Moves: b7b6 c4b3
+Moves: b7b6 c4d5
+Moves: b7b6 c4b5
+Moves: b7b6 c4e6
+Moves: b7b6 c4a6
+Moves: b7b6 c4f7
+Moves: b7b6 d7c8
+Moves: b7b6 d7c8
+Moves: b7b6 d7c8
+Moves: b7b6 d7c8
+Moves: a7a5 e1f1
+Moves: a7a5 e1f2
+Moves: a7a5 e1g1
+Moves: a7a5 h1g1
+Moves: a7a5 h1f1
+Moves: a7a5 b1c3
+Moves: a7a5 b1a3
+Moves: a7a5 h2h3
+Moves: a7a5 h2h4
+Moves: a7a5 g2g3
+Moves: a7a5 g2g4
+Moves: a7a5 e2g1
+Moves: a7a5 e2g3
+Moves: a7a5 e2c3
+Moves: a7a5 e2f4
+Moves: a7a5 e2d4
+Moves: a7a5 d2d1
+Moves: a7a5 d2e3
+Moves: a7a5 d2d3
+Moves: a7a5 d2c3
+Moves: a7a5 d2f4
+Moves: a7a5 d2d4
+Moves: a7a5 d2b4
+Moves: a7a5 d2g5
+Moves: a7a5 d2d5
+Moves: a7a5 d2a5
+Moves: a7a5 d2h6
+Moves: a7a5 d2d6
+Moves: a7a5 c2c3
+Moves: a7a5 b2b3
+Moves: a7a5 b2b4
+Moves: a7a5 a2a3
+Moves: a7a5 a2a4
+Moves: a7a5 c4d3
+Moves: a7a5 c4b3
+Moves: a7a5 c4d5
+Moves: a7a5 c4b5
+Moves: a7a5 c4e6
+Moves: a7a5 c4a6
+Moves: a7a5 c4f7
+Moves: a7a5 d7c8
+Moves: a7a5 d7c8
+Moves: a7a5 d7c8
+Moves: a7a5 d7c8
+Moves: a7a6 e1f1
+Moves: a7a6 e1f2
+Moves: a7a6 e1g1
+Moves: a7a6 h1g1
+Moves: a7a6 h1f1
+Moves: a7a6 b1c3
+Moves: a7a6 b1a3
+Moves: a7a6 h2h3
+Moves: a7a6 h2h4
+Moves: a7a6 g2g3
+Moves: a7a6 g2g4
+Moves: a7a6 e2g1
+Moves: a7a6 e2g3
+Moves: a7a6 e2c3
+Moves: a7a6 e2f4
+Moves: a7a6 e2d4
+Moves: a7a6 d2d1
+Moves: a7a6 d2e3
+Moves: a7a6 d2d3
+Moves: a7a6 d2c3
+Moves: a7a6 d2f4
+Moves: a7a6 d2d4
+Moves: a7a6 d2b4
+Moves: a7a6 d2g5
+Moves: a7a6 d2d5
+Moves: a7a6 d2a5
+Moves: a7a6 d2h6
+Moves: a7a6 d2d6
+Moves: a7a6 c2c3
+Moves: a7a6 b2b3
+Moves: a7a6 b2b4
+Moves: a7a6 a2a3
+Moves: a7a6 a2a4
+Moves: a7a6 c4d3
+Moves: a7a6 c4b3
+Moves: a7a6 c4d5
+Moves: a7a6 c4b5
+Moves: a7a6 c4e6
+Moves: a7a6 c4a6
+Moves: a7a6 c4f7
+Moves: a7a6 d7c8
+Moves: a7a6 d7c8
+Moves: a7a6 d7c8
+Moves: a7a6 d7c8
+Moves: h8g8 e1f1
+Moves: h8g8 e1f2
+Moves: h8g8 e1g1
+Moves: h8g8 h1g1
+Moves: h8g8 h1f1
+Moves: h8g8 b1c3
+Moves: h8g8 b1a3
+Moves: h8g8 h2h3
+Moves: h8g8 h2h4
+Moves: h8g8 g2g3
+Moves: h8g8 g2g4
+Moves: h8g8 e2g1
+Moves: h8g8 e2g3
+Moves: h8g8 e2c3
+Moves: h8g8 e2f4
+Moves: h8g8 e2d4
+Moves: h8g8 d2d1
+Moves: h8g8 d2e3
+Moves: h8g8 d2d3
+Moves: h8g8 d2c3
+Moves: h8g8 d2f4
+Moves: h8g8 d2d4
+Moves: h8g8 d2b4
+Moves: h8g8 d2g5
+Moves: h8g8 d2d5
+Moves: h8g8 d2a5
+Moves: h8g8 d2h6
+Moves: h8g8 d2d6
+Moves: h8g8 c2c3
+Moves: h8g8 b2b3
+Moves: h8g8 b2b4
+Moves: h8g8 a2a3
+Moves: h8g8 a2a4
+Moves: h8g8 c4d3
+Moves: h8g8 c4b3
+Moves: h8g8 c4d5
+Moves: h8g8 c4b5
+Moves: h8g8 c4e6
+Moves: h8g8 c4a6
+Moves: h8g8 c4f7
+Moves: h8g8 d7c8
+Moves: h8g8 d7c8
+Moves: h8g8 d7c8
+Moves: h8g8 d7c8
+Moves: d8a5 e1f1
+Moves: d8a5 e1f2
+Moves: d8a5 e1g1
+Moves: d8a5 d2c3
+Moves: d8a5 d2b4
+Moves: d8a5 d2a5
+Moves: d8a5 h1g1
+Moves: d8a5 h1f1
+Moves: d8a5 b1c3
+Moves: d8a5 b1a3
+Moves: d8a5 h2h3
+Moves: d8a5 h2h4
+Moves: d8a5 g2g3
+Moves: d8a5 g2g4
+Moves: d8a5 e2g1
+Moves: d8a5 e2g3
+Moves: d8a5 e2c3
+Moves: d8a5 e2f4
+Moves: d8a5 e2d4
+Moves: d8a5 c2c3
+Moves: d8a5 b2b3
+Moves: d8a5 b2b4
+Moves: d8a5 a2a3
+Moves: d8a5 a2a4
+Moves: d8a5 c4d3
+Moves: d8a5 c4b3
+Moves: d8a5 c4d5
+Moves: d8a5 c4b5
+Moves: d8a5 c4e6
+Moves: d8a5 c4a6
+Moves: d8a5 c4f7
+Moves: d8a5 d7d8
+Moves: d8a5 d7d8
+Moves: d8a5 d7d8
+Moves: d8a5 d7d8
+Moves: d8a5 d7c8
+Moves: d8a5 d7c8
+Moves: d8a5 d7c8
+Moves: d8a5 d7c8
+Moves: d8b6 e1f1
+Moves: d8b6 e1g1
+Moves: d8b6 h1g1
+Moves: d8b6 h1f1
+Moves: d8b6 b1c3
+Moves: d8b6 b1a3
+Moves: d8b6 h2h3
+Moves: d8b6 h2h4
+Moves: d8b6 g2g3
+Moves: d8b6 g2g4
+Moves: d8b6 e2g1
+Moves: d8b6 e2g3
+Moves: d8b6 e2c3
+Moves: d8b6 e2f4
+Moves: d8b6 e2d4
+Moves: d8b6 d2d1
+Moves: d8b6 d2e3
+Moves: d8b6 d2d3
+Moves: d8b6 d2c3
+Moves: d8b6 d2f4
+Moves: d8b6 d2d4
+Moves: d8b6 d2b4
+Moves: d8b6 d2g5
+Moves: d8b6 d2d5
+Moves: d8b6 d2a5
+Moves: d8b6 d2h6
+Moves: d8b6 d2d6
+Moves: d8b6 c2c3
+Moves: d8b6 b2b3
+Moves: d8b6 b2b4
+Moves: d8b6 a2a3
+Moves: d8b6 a2a4
+Moves: d8b6 c4d3
+Moves: d8b6 c4b3
+Moves: d8b6 c4d5
+Moves: d8b6 c4b5
+Moves: d8b6 c4e6
+Moves: d8b6 c4a6
+Moves: d8b6 c4f7
+Moves: d8b6 d7d8
+Moves: d8b6 d7d8
+Moves: d8b6 d7d8
+Moves: d8b6 d7d8
+Moves: d8b6 d7c8
+Moves: d8b6 d7c8
+Moves: d8b6 d7c8
+Moves: d8b6 d7c8
+Moves: d8d7 e1f1
+Moves: d8d7 e1f2
+Moves: d8d7 e1g1
+Moves: d8d7 h1g1
+Moves: d8d7 h1f1
+Moves: d8d7 b1c3
+Moves: d8d7 b1a3
+Moves: d8d7 h2h3
+Moves: d8d7 h2h4
+Moves: d8d7 g2g3
+Moves: d8d7 g2g4
+Moves: d8d7 e2g1
+Moves: d8d7 e2g3
+Moves: d8d7 e2c3
+Moves: d8d7 e2f4
+Moves: d8d7 e2d4
+Moves: d8d7 d2d1
+Moves: d8d7 d2e3
+Moves: d8d7 d2d3
+Moves: d8d7 d2c3
+Moves: d8d7 d2f4
+Moves: d8d7 d2d4
+Moves: d8d7 d2b4
+Moves: d8d7 d2g5
+Moves: d8d7 d2d5
+Moves: d8d7 d2a5
+Moves: d8d7 d2h6
+Moves: d8d7 d2d6
+Moves: d8d7 d2d7
+Moves: d8d7 c2c3
+Moves: d8d7 b2b3
+Moves: d8d7 b2b4
+Moves: d8d7 a2a3
+Moves: d8d7 a2a4
+Moves: d8d7 c4d3
+Moves: d8d7 c4b3
+Moves: d8d7 c4d5
+Moves: d8d7 c4b5
+Moves: d8d7 c4e6
+Moves: d8d7 c4a6
+Moves: d8d7 c4f7
+Moves: d8c7 e1f1
+Moves: d8c7 e1f2
+Moves: d8c7 e1g1
+Moves: d8c7 h1g1
+Moves: d8c7 h1f1
+Moves: d8c7 b1c3
+Moves: d8c7 b1a3
+Moves: d8c7 h2h3
+Moves: d8c7 h2h4
+Moves: d8c7 g2g3
+Moves: d8c7 g2g4
+Moves: d8c7 e2g1
+Moves: d8c7 e2g3
+Moves: d8c7 e2c3
+Moves: d8c7 e2f4
+Moves: d8c7 e2d4
+Moves: d8c7 d2d1
+Moves: d8c7 d2e3
+Moves: d8c7 d2d3
+Moves: d8c7 d2c3
+Moves: d8c7 d2f4
+Moves: d8c7 d2d4
+Moves: d8c7 d2b4
+Moves: d8c7 d2g5
+Moves: d8c7 d2d5
+Moves: d8c7 d2a5
+Moves: d8c7 d2h6
+Moves: d8c7 d2d6
+Moves: d8c7 c2c3
+Moves: d8c7 b2b3
+Moves: d8c7 b2b4
+Moves: d8c7 a2a3
+Moves: d8c7 a2a4
+Moves: d8c7 c4d3
+Moves: d8c7 c4b3
+Moves: d8c7 c4d5
+Moves: d8c7 c4b5
+Moves: d8c7 c4e6
+Moves: d8c7 c4a6
+Moves: d8c7 c4f7
+Moves: d8c7 d7d8
+Moves: d8c7 d7d8
+Moves: d8c7 d7d8
+Moves: d8c7 d7d8
+Moves: d8c7 d7c8
+Moves: d8c7 d7c8
+Moves: d8c7 d7c8
+Moves: d8c7 d7c8
+Moves: d8e8 e1f1
+Moves: d8e8 e1f2
+Moves: d8e8 e1g1
+Moves: d8e8 h1g1
+Moves: d8e8 h1f1
+Moves: d8e8 b1c3
+Moves: d8e8 b1a3
+Moves: d8e8 h2h3
+Moves: d8e8 h2h4
+Moves: d8e8 g2g3
+Moves: d8e8 g2g4
+Moves: d8e8 e2g1
+Moves: d8e8 e2g3
+Moves: d8e8 e2c3
+Moves: d8e8 e2f4
+Moves: d8e8 e2d4
+Moves: d8e8 d2d1
+Moves: d8e8 d2e3
+Moves: d8e8 d2d3
+Moves: d8e8 d2c3
+Moves: d8e8 d2f4
+Moves: d8e8 d2d4
+Moves: d8e8 d2b4
+Moves: d8e8 d2g5
+Moves: d8e8 d2d5
+Moves: d8e8 d2a5
+Moves: d8e8 d2h6
+Moves: d8e8 d2d6
+Moves: d8e8 c2c3
+Moves: d8e8 b2b3
+Moves: d8e8 b2b4
+Moves: d8e8 a2a3
+Moves: d8e8 a2a4
+Moves: d8e8 c4d3
+Moves: d8e8 c4b3
+Moves: d8e8 c4d5
+Moves: d8e8 c4b5
+Moves: d8e8 c4e6
+Moves: d8e8 c4a6
+Moves: d8e8 c4f7
+Moves: d8e8 d7e8
+Moves: d8e8 d7e8
+Moves: d8e8 d7e8
+Moves: d8e8 d7e8
+Moves: d8e8 d7d8
+Moves: d8e8 d7d8
+Moves: d8e8 d7d8
+Moves: d8e8 d7d8
+Moves: d8e8 d7c8
+Moves: d8e8 d7c8
+Moves: d8e8 d7c8
+Moves: d8e8 d7c8
+Moves: c8d7 e1f1
+Moves: c8d7 e1f2
+Moves: c8d7 e1g1
+Moves: c8d7 h1g1
+Moves: c8d7 h1f1
+Moves: c8d7 b1c3
+Moves: c8d7 b1a3
+Moves: c8d7 h2h3
+Moves: c8d7 h2h4
+Moves: c8d7 g2g3
+Moves: c8d7 g2g4
+Moves: c8d7 e2g1
+Moves: c8d7 e2g3
+Moves: c8d7 e2c3
+Moves: c8d7 e2f4
+Moves: c8d7 e2d4
+Moves: c8d7 d2d1
+Moves: c8d7 d2e3
+Moves: c8d7 d2d3
+Moves: c8d7 d2c3
+Moves: c8d7 d2f4
+Moves: c8d7 d2d4
+Moves: c8d7 d2b4
+Moves: c8d7 d2g5
+Moves: c8d7 d2d5
+Moves: c8d7 d2a5
+Moves: c8d7 d2h6
+Moves: c8d7 d2d6
+Moves: c8d7 d2d7
+Moves: c8d7 c2c3
+Moves: c8d7 b2b3
+Moves: c8d7 b2b4
+Moves: c8d7 a2a3
+Moves: c8d7 a2a4
+Moves: c8d7 c4d3
+Moves: c8d7 c4b3
+Moves: c8d7 c4d5
+Moves: c8d7 c4b5
+Moves: c8d7 c4e6
+Moves: c8d7 c4a6
+Moves: c8d7 c4f7
+Moves: b8a6 e1f1
+Moves: b8a6 e1f2
+Moves: b8a6 e1g1
+Moves: b8a6 h1g1
+Moves: b8a6 h1f1
+Moves: b8a6 b1c3
+Moves: b8a6 b1a3
+Moves: b8a6 h2h3
+Moves: b8a6 h2h4
+Moves: b8a6 g2g3
+Moves: b8a6 g2g4
+Moves: b8a6 e2g1
+Moves: b8a6 e2g3
+Moves: b8a6 e2c3
+Moves: b8a6 e2f4
+Moves: b8a6 e2d4
+Moves: b8a6 d2d1
+Moves: b8a6 d2e3
+Moves: b8a6 d2d3
+Moves: b8a6 d2c3
+Moves: b8a6 d2f4
+Moves: b8a6 d2d4
+Moves: b8a6 d2b4
+Moves: b8a6 d2g5
+Moves: b8a6 d2d5
+Moves: b8a6 d2a5
+Moves: b8a6 d2h6
+Moves: b8a6 d2d6
+Moves: b8a6 c2c3
+Moves: b8a6 b2b3
+Moves: b8a6 b2b4
+Moves: b8a6 a2a3
+Moves: b8a6 a2a4
+Moves: b8a6 c4d3
+Moves: b8a6 c4b3
+Moves: b8a6 c4d5
+Moves: b8a6 c4b5
+Moves: b8a6 c4e6
+Moves: b8a6 c4a6
+Moves: b8a6 c4f7
+Moves: b8a6 d7c8
+Moves: b8a6 d7c8
+Moves: b8a6 d7c8
+Moves: b8a6 d7c8
+Moves: b8d7 e1f1
+Moves: b8d7 e1f2
+Moves: b8d7 e1g1
+Moves: b8d7 h1g1
+Moves: b8d7 h1f1
+Moves: b8d7 b1c3
+Moves: b8d7 b1a3
+Moves: b8d7 h2h3
+Moves: b8d7 h2h4
+Moves: b8d7 g2g3
+Moves: b8d7 g2g4
+Moves: b8d7 e2g1
+Moves: b8d7 e2g3
+Moves: b8d7 e2c3
+Moves: b8d7 e2f4
+Moves: b8d7 e2d4
+Moves: b8d7 d2d1
+Moves: b8d7 d2e3
+Moves: b8d7 d2d3
+Moves: b8d7 d2c3
+Moves: b8d7 d2f4
+Moves: b8d7 d2d4
+Moves: b8d7 d2b4
+Moves: b8d7 d2g5
+Moves: b8d7 d2d5
+Moves: b8d7 d2a5
+Moves: b8d7 d2h6
+Moves: b8d7 d2d6
+Moves: b8d7 d2d7
+Moves: b8d7 c2c3
+Moves: b8d7 b2b3
+Moves: b8d7 b2b4
+Moves: b8d7 a2a3
+Moves: b8d7 a2a4
+Moves: b8d7 c4d3
+Moves: b8d7 c4b3
+Moves: b8d7 c4d5
+Moves: b8d7 c4b5
+Moves: b8d7 c4e6
+Moves: b8d7 c4a6
+Moves: b8d7 c4f7"""
+
+    b = subprocess.run(
+        r'C:\Users\amits\Downloads\perft.exe 4 -3 "rnbq1k1r/pp1Pbppp/2p5/8/2B5/8/PPPQNnPP/RNB1K2R b KQ - 0 1"',
+        stdout=subprocess.PIPE).stdout.decode("utf-8")
+
+    for row in a.splitlines():
+        _, moves = row.split(":")
+        if moves not in b:
+            print(moves)
+
+
+if __name__ == "__main__":
+    diff_perft_1()
+
