@@ -1,48 +1,71 @@
-
-from flask import Flask, render_template
+import os
+from flask import Flask, request, send_from_directory
+from flask_cors import CORS
 import subprocess
 from subprocess import PIPE
 
-app = Flask(__name__)
+from engine_communications import read_board_from_engine, read_possible_moves_from_engine, send_move_to_engine
+
+app = Flask(__name__, static_url_path="/static", static_folder="frontend/build")
+CORS(app)
+
+state_map = {}
 
 
-ENGINE = None
+@app.route("/start_game")
+def start_game():
+    engine = subprocess.Popen(r"C:\Users\amits\work\rust\projects\xo_ai\target\release\xo_ai.exe", stdin=PIPE, stdout=PIPE)
+    board = read_board_from_engine(engine)
+    possible_moves = read_possible_moves_from_engine(engine)
+
+    key = max(state_map.keys(), default=1)
+    state_map[key] = {
+        "engine": engine
+    }
+    return {
+        "key": key,
+        "board": board,
+        "possible_moves": possible_moves
+    }
 
 
-def readline(engine: subprocess.Popen):
-    return engine.stdout.readline().replace(b'\n', b'').decode("utf-8")
+class InvalidMove(Exception):
+    pass
 
 
-def read_board_from_engine(engine: subprocess.Popen):
-    board = [[None] * 8 for i in range(8)]
-    piece_count = int(readline(engine))
-    for i in range(piece_count):
-        x, y, piece_type = readline(engine).split()
-        board[int(x)][int(y)] = piece_type
-    return board
+@app.route("/do_move", methods=["POST"])
+def do_move():
+    r = request.json
+    state = state_map[r["key"]]
+    engine = state['engine']
 
+    ok, resp = send_move_to_engine(r["move"], engine)
 
-def read_possible_moves_from_engine(engine: subprocess.Popen):
-    moves = []
-    moves_count = int(readline(engine))
-    for i in range(moves_count):
-        moves.append(readline(engine))
-    return moves
+    if not ok:
+        raise InvalidMove(resp)
 
+    board = read_board_from_engine(engine)
+    board = read_board_from_engine(engine)
+    possible_moves = read_possible_moves_from_engine(engine)
 
-@app.route("/")
-def main_screen():
-    global ENGINE
-    if ENGINE is not None:
-        ENGINE.terminate()
-
-    ENGINE = subprocess.Popen(r"C:\Users\amits\work\rust\projects\xo_ai\target\release\xo_ai.exe", stdin=PIPE, stdout=PIPE)
-    board = read_board_from_engine(ENGINE)
-    possible_moves = read_possible_moves_from_engine(ENGINE)
-    print(len(possible_moves))
+    print(board)
     print(possible_moves)
 
-    return render_template("start_screen.html", board=board, possible_moves=possible_moves)
+    return {
+        "board": board,
+        "possible_moves": possible_moves
+    }
+
+
+# # Serve React App
+# @app.route('/', defaults={'path': ''})
+# @app.route('/<path:path>')
+# def serve(path):
+#     print("Serving", path)
+#     if path != "" and os.path.exists(app.static_folder + '/' + path):
+#         return send_from_directory(app.static_folder, path)
+#     else:
+#         return send_from_directory(app.static_folder, 'index.html')
 
 
 if __name__ == "__main__":

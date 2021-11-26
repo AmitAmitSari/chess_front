@@ -1,2 +1,4 @@
 selenium
 flask
+flask_cors
+requests
