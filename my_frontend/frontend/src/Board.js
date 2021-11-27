@@ -9,9 +9,7 @@ function square(x, y, state) {
     if (arr_eq([x, y], state.selected_square)) {
         classes.push("selected");
     }
-    if (state.possible_moves.filter(m => arr_eq(m.to, [x, y])).length > 0) {
-        classes.push("move-to");
-    } else if (x % 2 === y % 2) {
+    if (x % 2 === y % 2) {
         classes.push("black-square");
     } else {
         classes.push("white-square");
@@ -33,6 +31,9 @@ function square(x, y, state) {
     }
 
     const inner_classes = [];
+    if (state.possible_moves.filter(m => arr_eq(m.to, [x, y])).length > 0) {
+        inner_classes.push("move-to");
+    }
     if (color !== "") {
         inner_classes.push("piece-here");
     }
