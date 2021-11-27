@@ -7,6 +7,9 @@
 }
 
 table td > div {
+    display: flex;
+    justify-content: center;
+    align-items: center;
     height: 150px;
     width: 150px;
 }
@@ -22,27 +25,17 @@ table td > div {
 .move-to {
     display: inline-block;
     background-color: rgb(0, 0, 0, 0.5);
-    /* box-sizing: content-box;
-    background-clip: content-box; */
-    /* background-position: 2000% 100%; */
     transform-box: content-box;
-    transform: translateY(150%);
     border-radius: 50%;
     width: 20%;
     height: 20%;
-    /* margin: auto; */
-    /* padding: 4.2%; */
-    /* position: absolute; */
-    /* top: 0; */
-    /* left: 0; */
 }
 
 .capture-to {
-    border-width: 10px;
     border-color:rgb(0, 0, 0, 0.5);
     border-radius: 50%;
     border-style: solid;
-    background-clip: content-box;
+    background-clip: border-box;
     box-sizing: border-box;
 }
 
