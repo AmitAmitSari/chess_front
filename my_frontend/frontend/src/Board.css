@@ -37,6 +37,15 @@ table td > div {
     /* left: 0; */
 }
 
+.capture-to {
+    border-width: 10px;
+    border-color:rgb(0, 0, 0, 0.5);
+    border-radius: 50%;
+    border-style: solid;
+    background-clip: content-box;
+    box-sizing: border-box;
+}
+
 .piece-here {
     background-repeat: no-repeat;
     background-size: auto;

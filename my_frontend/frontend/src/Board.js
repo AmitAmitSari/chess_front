@@ -32,7 +32,11 @@ function square(x, y, state) {
 
     const inner_classes = [];
     if (state.possible_moves.filter(m => arr_eq(m.to, [x, y])).length > 0) {
-        inner_classes.push("move-to");
+        if (state.board[x][y] !== "") {
+            inner_classes.push("capture-to");
+        } else {
+            inner_classes.push("move-to");
+        }
     }
     if (color !== "") {
         inner_classes.push("piece-here");

@@ -14,12 +14,12 @@ function parseMoveString(move_str) {
         from: [fx, fy],
         to: [tx, ty],
         eaten: [ex, ey],
-        eaten_type: et
+        end_type: et
     }
 }
 
 function unparseMove(move) {
-    return [move.from[0], move.from[1], move.to[0], move.to[1], move.eaten[0], move.eaten[1], move.eaten_type].join(" ");
+    return [move.from[0], move.from[1], move.to[0], move.to[1], move.eaten[0], move.eaten[1], move.end_type].join(" ");
 }
 
 export {
