@@ -2,3 +2,4 @@ selenium
 flask
 flask_cors
 requests
+gunicorn
