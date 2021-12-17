@@ -6,7 +6,7 @@ from subprocess import PIPE
 
 from engine_communications import read_board_from_engine, read_possible_moves_from_engine, send_move_to_engine
 
-app = Flask(__name__, static_url_path="/static", static_folder="./build")
+app = Flask(__name__, static_folder="./build")
 # CORS(app)
 
 state_map = {}
