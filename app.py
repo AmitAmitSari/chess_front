@@ -1,13 +1,13 @@
 import os
 from flask import Flask, request, send_from_directory
-from flask_cors import CORS
+# from flask_cors import CORS
 import subprocess
 from subprocess import PIPE
 
 from engine_communications import read_board_from_engine, read_possible_moves_from_engine, send_move_to_engine
 
-app = Flask(__name__, static_url_path="/static", static_folder="frontend/build")
-CORS(app)
+app = Flask(__name__, static_url_path="/static", static_folder="./build")
+# CORS(app)
 
 state_map = {}
 
@@ -55,6 +55,12 @@ def do_move():
         "board": board,
         "possible_moves": possible_moves
     }
+
+
+@app.route("/ping")
+def ping():
+    print("Ping")
+    return "pong"
 
 
 # # Serve React App
