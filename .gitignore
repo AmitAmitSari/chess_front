@@ -1,6 +1,6 @@
 .idea/
 
-my_frontend/frontend/node_modules/
-my_frontend/frontend/build/
+frontend/node_modules/
+frontend/build/
 
 __pycache__/
