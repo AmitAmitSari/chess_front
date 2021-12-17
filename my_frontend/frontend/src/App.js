@@ -1,8 +1,12 @@
 import logo from './logo.svg';
 import './App.css';
 import Board from './Board.js';
+import PromotionOptions from './PromotionOptions.js';
 import { useEffect, useState } from 'react';
 import { range, arr_eq, parseMoveString, unparseMove } from './utils';
+
+// const main_url = "http://192.168.1.19:5000";
+const main_url = "https://hamitos-chessbot.herokuapp.com"
 
 function App() {
     const [key, setKey] = useState(null);
@@ -10,9 +14,10 @@ function App() {
     const [possible_moves, setPossibleMoves] = useState([]);
     const [selected_square, setSelectedSquare] = useState(null);
     const [last_move, setLastMove] = useState(null);
+    const [promotion_moves, setPromotionMoves] = useState([]);
 
     useEffect(() => {
-        fetch("http://localhost:5000/start_game")
+        fetch(main_url + "/start_game")
             .then(res => res.json())
             .then(
                 (res) => {
@@ -26,7 +31,7 @@ function App() {
     
     useEffect(() => {
         console.log("Doing move, ", last_move);
-        fetch("http://localhost:5000/do_move", {
+        fetch(main_url + "/do_move", {
             method: "post",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
@@ -43,7 +48,25 @@ function App() {
             }));
     }, [last_move]);
 
+    function do_move(move) {
+        const from_type = board[move.from[0]][move.from[1]];
+        if (from_type.toUpperCase() == from_type) {
+            board[move.to[0]][move.to[1]] = "PNBRQK"[move.end_type]
+        } else {
+            board[move.to[0]][move.to[1]] = "pnbrqk"[move.end_type]
+        }
+        board[move.from[0]][move.from[1]] = "";
+        setBoard(board);
+        setPossibleMoves([]);
+        setSelectedSquare(null);
+        setPromotionMoves([]);
+        const move_str = unparseMove(move);
+        setLastMove(move_str);
+    }
+
     function click_square(x, y) {
+
+        setPromotionMoves([]);
 
         if (selected_square === null) {
             setSelectedSquare([x, y]);
@@ -57,24 +80,34 @@ function App() {
             return;
         }
 
-        const move = selected_moves[0];
-        const from_type = board[move.from[0]][move.from[1]];
-        if (from_type.toUpperCase() == from_type) {
-            board[move.to[0]][move.to[1]] = "PNBRQK"[move.end_type]
-        } else {
-            board[move.to[0]][move.to[1]] = "pnbrqk"[move.end_type]
+        if (selected_moves.length > 1) {
+            // pawn promotion
+            setPromotionMoves(selected_moves);
+            return;
         }
-        board[move.from[0]][move.from[1]] = "";
-        setBoard(board);
-        setPossibleMoves([]);
-        setSelectedSquare(null);
-        const move_str = unparseMove(move);
-        setLastMove(move_str);
+
+        // todo: on castle the rook only moves after the other players turn.
+        // todo: remove en passant pawn.
+        const move = selected_moves[0];
+        do_move(move);
     }
+
+    function choose_promotion(move) {
+        do_move(move);
+
+    }
+
+    let show_moves = possible_moves.slice();
+    show_moves = show_moves.filter(move => arr_eq(move.from, selected_square))
+    
+    if (promotion_moves.length > 0) {
+        show_moves = promotion_moves;
+    }
+    
 
     const state = {
         board: board,
-        possible_moves: possible_moves.filter(move => arr_eq(move.from, selected_square)),
+        possible_moves: show_moves,
         selected_square: selected_square,
         click_square: click_square
     };
@@ -84,9 +117,15 @@ function App() {
     return (
         <div className="App">
             <header className="App-header">
-                <Board
-                    state={state}
-                />
+                <div className="main">
+                    <PromotionOptions
+                        promotion_moves={promotion_moves}
+                        color={'w'}
+                        onClick={choose_promotion}/>
+                    <Board
+                        state={state}
+                    />
+                </div>
             </header>
         </div>
     );

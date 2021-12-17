@@ -5,6 +5,7 @@ import { arr_eq } from "./utils";
 
 function square(x, y, state) {
     const classes = [""];
+    
     const at_square = state.board[x][y];
     if (arr_eq([x, y], state.selected_square)) {
         classes.push("selected");
@@ -53,13 +54,14 @@ function square(x, y, state) {
 }
 
 function row(y, state) {
-    return [...Array(8).keys()].map(x => <td key={"col-" + x}>{square(x, y, state)}</td>);
+    return [...Array(8).keys()].map(x => <td key={"col-" + (7-x)}>{square(7-x, y, state)}</td>);
 }
 
 
 function Board({state}) {
 
-    const rows = [...Array(8).keys()].map(y => <tr key={"row-" + y}>{row(y, state)}</tr>);
+    // Hack to flip board for white.
+    const rows = [...Array(8).keys()].map(y => <tr key={"row-" + (7-y)}>{row(7-y, state)}</tr>);
 
     return (
         <table border="1" className="board-table">
