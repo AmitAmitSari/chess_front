@@ -14,7 +14,7 @@ state_map = {}
 
 @app.route("/start_game")
 def start_game():
-    engine = subprocess.Popen(r"C:\Users\amits\work\rust\projects\xo_ai\target\release\xo_ai.exe", stdin=PIPE, stdout=PIPE)
+    engine = subprocess.Popen(r"./chess_ai/target/release/xo_ai.exe", stdin=PIPE, stdout=PIPE)
     board = read_board_from_engine(engine)
     possible_moves = read_possible_moves_from_engine(engine)
 
