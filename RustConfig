@@ -1,1 +1,1 @@
-RUST_CARGO_BUILD_FLAGS="--release --manifest-path chess_ai/cargo.toml"
+RUST_CARGO_BUILD_FLAGS="--release --manifest-path chess_ai/Cargo.toml"
