@@ -11,11 +11,15 @@
     "react-scripts": "4.0.3",
     "web-vitals": "^1.1.2"
   },
+  "cacheDirectories": [
+    "frontend/node_modules"
+  ],
   "scripts": {
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
-    "eject": "react-scripts eject"
+    "eject": "react-scripts eject",
+    "heroku-postbuild": "cd client && npm install && npm run build"
   },
   "eslintConfig": {
     "extends": [
