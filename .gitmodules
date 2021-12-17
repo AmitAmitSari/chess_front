@@ -1,0 +1,3 @@
+[submodule "chess_ai"]
+	path = chess_ai
+	url = git@bitbucket.org:AmitSari/chess_ai.git
