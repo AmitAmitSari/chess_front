@@ -18,7 +18,7 @@ def start_game():
     board = read_board_from_engine(engine)
     possible_moves = read_possible_moves_from_engine(engine)
 
-    key = max(state_map.keys(), default=1)
+    key = max(state_map.keys(), default=0) + 1
     state_map[key] = {
         "engine": engine
     }
