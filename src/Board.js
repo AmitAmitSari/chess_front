@@ -25,11 +25,7 @@ function square(x, y, state) {
         }
     }
     const piece_letter = at_square.toLowerCase();
-    const background = `url(/media/${color}${piece_letter}.png)`;
-    const style = {};
-    if (color !== "") {
-        style["backgroundImage"] = background;
-    }
+    const background = `/media/${color}${piece_letter}.png`;
 
     const inner_classes = [];
     if (state.possible_moves.filter(m => arr_eq(m.to, [x, y])).length > 0) {
@@ -42,8 +38,8 @@ function square(x, y, state) {
     if (color !== "") {
         inner_classes.push("piece-here");
     }
-
-    const piece = <div className={inner_classes.join(" ")} style={style}></div>;
+    const img = color !== "" ? <img className="piece-here" src={background} alt={piece_letter} /> : <></>;
+    const piece = <div className={inner_classes.join(" ")}>{img}</div>;
     
     return (
     <div id={"square-" + x + "-" + y }

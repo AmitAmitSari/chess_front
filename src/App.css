@@ -29,6 +29,8 @@
 }
 
 .main {
+  height: 100vmin;
+  width: 100vmin;
   display: inline-grid;
   grid-template-columns: 1fr, 8fr;
   grid-template-rows: 8fr;

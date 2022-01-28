@@ -5,7 +5,7 @@ import PromotionOptions from './PromotionOptions.js';
 import { useEffect, useState } from 'react';
 import { range, arr_eq, parseMoveString, unparseMove } from './utils';
 
-// const main_url = "http://192.168.1.19:5000";
+// const main_url = "http://127.0.0.1:5000";
 const main_url = "https://hamitos-chessbot.herokuapp.com"
 
 function App() {
