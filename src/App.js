@@ -49,6 +49,13 @@ function App() {
 
     function do_move(move) {
         const from_type = board[move.from[0]][move.from[1]];
+        if (from_type.toUpperCase() === from_type) {
+            board[move.to[0]][move.to[1]] = "PNBRQK"[move.end_type]
+        } else {
+            board[move.to[0]][move.to[1]] = "pnbrqk"[move.end_type]
+        }
+        board[move.from[0]][move.from[1]] = "";
+        setBoard(board);
         setPossibleMoves([]);
         setSelectedSquare(null);
         setPromotionMoves([]);
@@ -78,6 +85,8 @@ function App() {
             return;
         }
 
+        // todo: on castle the rook only moves after pinging server.
+        // todo: remove en passant pawn.
         const move = selected_moves[0];
         do_move(move);
     }
