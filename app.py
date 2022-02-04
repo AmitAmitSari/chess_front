@@ -1,5 +1,5 @@
 import os
-from flask import Flask, request, send_from_directory, g
+from flask import Flask, request, send_from_directory
 from flask_socketio import SocketIO, emit
 # from flask_cors import CORS
 import subprocess
@@ -9,7 +9,7 @@ from engine_communications import read_board_from_engine, read_possible_moves_fr
 
 app = Flask(__name__, static_folder="./build")
 # CORS(app)
-socketio = SocketIO(app)
+socketio = SocketIO(app)  # , cors_allowed_origins="*")
 
 state_map = {}
 
