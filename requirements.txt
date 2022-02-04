@@ -1,5 +1,6 @@
 selenium
 flask
+flask-socketio
 flask_cors
 requests
 gunicorn

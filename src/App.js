@@ -3,13 +3,14 @@ import './App.css';
 import Board from './Board.js';
 import PromotionOptions from './PromotionOptions.js';
 import { useEffect, useState } from 'react';
+import socketIOClient from 'socket.io-client';
 import { range, arr_eq, parseMoveString, unparseMove } from './utils';
 
 // const main_url = "http://127.0.0.1:5000";
 const main_url = "https://hamitos-chessbot.herokuapp.com"
 
 function App() {
-    const [key, setKey] = useState(null);
+    const [socket, setSocket] = useState(null);
     const [board, setBoard] = useState(range(8).map(_ => range(8).map(_ => "")));
     const [possible_moves, setPossibleMoves] = useState([]);
     const [selected_square, setSelectedSquare] = useState(null);
@@ -17,46 +18,37 @@ function App() {
     const [promotion_moves, setPromotionMoves] = useState([]);
 
     useEffect(() => {
-        fetch(main_url + "/start_game")
-            .then(res => res.json())
-            .then(
-                (res) => {
-                    console.log("Stated game", res)
-                    setKey(res.key);
-                    setBoard(res.board);
-                    setPossibleMoves(res.possible_moves.map(parseMoveString))
-                }
-            );
+        const socket = socketIOClient(main_url);
+
+        socket.on("connect", (key) => {
+            console.log("Connected");
+        });
+
+        socket.on("board", board => {
+            console.log("Got board");
+            setBoard(board);
+        });
+
+        socket.on("possible_moves", possible_moves => {
+            console.log("possible_moves");
+            setPossibleMoves(possible_moves.map(parseMoveString));
+        });
+
+        console.log("Emitting start_game")
+        socket.emit("start_game");
+
+        setSocket(socket);
     }, []);
     
     useEffect(() => {
-        console.log("Doing move, ", last_move);
-        fetch(main_url + "/do_move", {
-            method: "post",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-                key: key,
-                move: last_move
-            })
-        })
-            .then(res => res.json(), err => { console.log("ERROR", err) })
-            .then((res => {
-                console.log("Got back repspose for move, ", last_move, res);
-                setBoard(res.board);
-                setPossibleMoves(res.possible_moves.map(parseMoveString));
-                setSelectedSquare(null);
-            }));
+        if (socket !== null) {
+            console.log("Doing move, ", last_move);
+            socket.emit("do_move", { move: last_move });
+        }
     }, [last_move]);
 
     function do_move(move) {
         const from_type = board[move.from[0]][move.from[1]];
-        if (from_type.toUpperCase() === from_type) {
-            board[move.to[0]][move.to[1]] = "PNBRQK"[move.end_type]
-        } else {
-            board[move.to[0]][move.to[1]] = "pnbrqk"[move.end_type]
-        }
-        board[move.from[0]][move.from[1]] = "";
-        setBoard(board);
         setPossibleMoves([]);
         setSelectedSquare(null);
         setPromotionMoves([]);
@@ -86,8 +78,6 @@ function App() {
             return;
         }
 
-        // todo: on castle the rook only moves after the other players turn.
-        // todo: remove en passant pawn.
         const move = selected_moves[0];
         do_move(move);
     }

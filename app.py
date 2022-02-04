@@ -1,5 +1,6 @@
 import os
-from flask import Flask, request, send_from_directory
+from flask import Flask, request, send_from_directory, g
+from flask_socketio import SocketIO, emit
 # from flask_cors import CORS
 import subprocess
 from subprocess import PIPE
@@ -8,53 +9,51 @@ from engine_communications import read_board_from_engine, read_possible_moves_fr
 
 app = Flask(__name__, static_folder="./build")
 # CORS(app)
+socketio = SocketIO(app)
 
 state_map = {}
 
 
-@app.route("/start_game")
-def start_game():
-    engine = subprocess.Popen(r"./chess_ai/target/release/xo_ai", stdin=PIPE, stdout=PIPE)
-    board = read_board_from_engine(engine)
-    possible_moves = read_possible_moves_from_engine(engine)
+@socketio.on("connect")
+def connect():
+    print("Connecting")
 
-    key = max(state_map.keys(), default=0) + 1
-    state_map[key] = {
-        "engine": engine
-    }
-    return {
-        "key": key,
-        "board": board,
-        "possible_moves": possible_moves
-    }
+
+@socketio.event
+def start_game():
+    print("start_game", request.sid)
+    engine = subprocess.Popen(r"./chess_ai/target/release/xo_ai", stdin=PIPE, stdout=PIPE)
+    state_map[request.sid] = engine
+
+    board = read_board_from_engine(engine)
+    print(board)
+    emit("board", board)
+    possible_moves = read_possible_moves_from_engine(engine)
+    print(possible_moves)
+    emit("possible_moves", possible_moves)
+
+    return True
 
 
 class InvalidMove(Exception):
     pass
 
 
-@app.route("/do_move", methods=["POST"])
-def do_move():
-    r = request.json
-    state = state_map[r["key"]]
-    engine = state['engine']
-
+@socketio.event
+def do_move(json):
+    print("do_move")
+    engine = state_map[request.sid]
+    r = json
     ok, resp = send_move_to_engine(r["move"], engine)
 
     if not ok:
         raise InvalidMove(resp)
 
-    board = read_board_from_engine(engine)
-    board = read_board_from_engine(engine)
-    possible_moves = read_possible_moves_from_engine(engine)
+    emit("board", read_board_from_engine(engine))
+    emit("board", read_board_from_engine(engine))
+    emit("possible_moves", read_possible_moves_from_engine(engine))
 
-    print(board)
-    print(possible_moves)
-
-    return {
-        "board": board,
-        "possible_moves": possible_moves
-    }
+    return True
 
 
 @app.route("/ping")
@@ -75,4 +74,4 @@ def serve(path):
 
 
 if __name__ == "__main__":
-    app.run("0.0.0.0", 5000)
+    socketio.run("0.0.0.0", 5000)
