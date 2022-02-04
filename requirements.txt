@@ -4,4 +4,5 @@ flask-socketio
 flask_cors
 requests
 gunicorn
-eventlet
+gevent
+gevent-websocket
