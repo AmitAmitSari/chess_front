@@ -24,14 +24,15 @@ function App() {
             console.log("Connected");
         });
 
-        socket.on("board", board => {
+        socket.on("board", new_board => {
             console.log("Got board");
-            setBoard(board);
+            setBoard(new_board);
         });
 
         socket.on("possible_moves", possible_moves => {
             console.log("possible_moves");
             setPossibleMoves(possible_moves.map(parseMoveString));
+            setLastMove(null);
         });
 
         console.log("Emitting start_game")
@@ -39,15 +40,9 @@ function App() {
 
         setSocket(socket);
     }, []);
-    
-    useEffect(() => {
-        if (socket !== null) {
-            console.log("Doing move, ", last_move);
-            socket.emit("do_move", { move: last_move });
-        }
-    }, [last_move]);
 
     function do_move(move) {
+        console.log("Doing move, ", move);
         const from_type = board[move.from[0]][move.from[1]];
         if (from_type.toUpperCase() === from_type) {
             board[move.to[0]][move.to[1]] = "PNBRQK"[move.end_type]
@@ -56,11 +51,13 @@ function App() {
         }
         board[move.from[0]][move.from[1]] = "";
         setBoard(board);
+
         setPossibleMoves([]);
         setSelectedSquare(null);
         setPromotionMoves([]);
+        setLastMove(move);
         const move_str = unparseMove(move);
-        setLastMove(move_str);
+        socket.emit("do_move", { move: move_str });
     }
 
     function click_square(x, y) {
@@ -108,7 +105,8 @@ function App() {
         board: board,
         possible_moves: show_moves,
         selected_square: selected_square,
-        click_square: click_square
+        click_square: click_square,
+        last_move: last_move,
     };
 
     console.log("state", state)

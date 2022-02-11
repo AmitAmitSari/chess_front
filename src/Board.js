@@ -16,6 +16,7 @@ function square(x, y, state) {
         classes.push("white-square");
     }
 
+
     let color = "";
     if (at_square !== "") {
         if (at_square === at_square.toUpperCase()) {
@@ -37,6 +38,12 @@ function square(x, y, state) {
     }
     if (color !== "") {
         inner_classes.push("piece-here");
+    }
+    if (state.last_move?.to[0] === x && state.last_move?.to[1] === y) {
+        inner_classes.push("last-move-to");
+    }
+    if (state.last_move?.from[0] === x && state.last_move?.from[1] === y) {
+        inner_classes.push("last-move-from");
     }
     const img = color !== "" ? <img className="piece-here" src={background} alt={piece_letter} /> : <></>;
     const piece = <div className={inner_classes.join(" ")}>{img}</div>;
