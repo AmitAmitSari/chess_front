@@ -1,15 +1,17 @@
 import os
 from flask import Flask, request, send_from_directory
 from flask_socketio import SocketIO, emit
-# from flask_cors import CORS
 import subprocess
 from subprocess import PIPE
 
 from engine_communications import read_board_from_engine, read_possible_moves_from_engine, send_move_to_engine
 
 app = Flask(__name__, static_folder="./build")
-# CORS(app)
-socketio = SocketIO(app)  # , cors_allowed_origins="*")
+
+DEVELOP = False
+options = {} if not DEVELOP else {"cors_allowed_origins": "*"}
+
+socketio = SocketIO(app, **options)
 
 state_map = {}
 
