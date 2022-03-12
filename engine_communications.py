@@ -23,8 +23,8 @@ def read_possible_moves_from_engine(engine: subprocess.Popen) -> List[str]:
     return moves
 
 
-def send_move_to_engine(move: str, engine: subprocess.Popen) -> (bool, str):
-    mv = (move + "\n").encode("utf-8")
+def send_move_to_engine(move: str, timeout_seconds: int, engine: subprocess.Popen) -> (bool, str):
+    mv = "{move}__{timeout_seconds}\n".format(move=move, timeout_seconds=timeout_seconds).encode("utf-8")
     print("sending move:", mv)
 
     engine.stdin.write(mv)

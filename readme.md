@@ -2,6 +2,7 @@
 # How to debug
 
 * Change develop constants to true
+* If changed rust code - recompile with cargo build --release
 * npm start
 * flask run
 
