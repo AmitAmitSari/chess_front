@@ -46,7 +46,7 @@ def do_move(json):
     print("do_move")
     engine = state_map[request.sid]
     r = json
-    ok, resp = send_move_to_engine(r["move"], 10, engine)
+    ok, resp = send_move_to_engine(r["move"], 3, engine)
 
     if not ok:
         raise InvalidMove(resp)
