@@ -6,6 +6,11 @@
 * npm start
 * flask run
 
+# How to deploy
+
+* If not logged in run "heroku login"
+* git push heroku master
+
 # todo:
 
 * Get a time limit and return a move within that limit.
