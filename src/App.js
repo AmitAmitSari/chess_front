@@ -6,6 +6,7 @@ import { useEffect, useState } from 'react';
 import socketIOClient from 'socket.io-client';
 import { range, arr_eq, parseMoveString, unparseMove } from './utils';
 
+// todo: Use environment variables
 const develop = false;
 const main_url = develop ? "http://127.0.0.1:5000" : "https://hamitos-chessbot.herokuapp.com";
 
